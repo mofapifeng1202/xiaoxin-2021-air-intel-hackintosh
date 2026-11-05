@@ -1,0 +1,85 @@
+=== 监控开始 2026-11-04 23:06:25 ===
+23:06:25  displayWrangler=1  "bklt"={"min"=0,"max"=65535,"value"=65403}
+23:07:25  displayWrangler=0  "bklt"={"min"=0,"max"=65535,"value"=65403}
+23:07:39  displayWrangler=1  "bklt"={"min"=0,"max"=65535,"value"=65403}
+23:07:39  ===== WAKE DETECTED ===== 
+--- 背光参数 ---
+"IODisplayParameters" = {"commit"={"reg"=0},"linear-brightness-probe"={"min"=0,"max"=65403,"value"=65403},"fade-time2"={"min"=0,"max"=10000,"value"=4000},"ggsc"={"min"=0,"max"=65536,"value"=65536},"vblm"={"min"=0,"max"=196608,"value"=65536},"dsyp"={"min"=0,"max"=2,"value"=0},"rgsc"={"min"=0,"max"=65536,"value"=65536},"fade-style"={"min"=0,"max"=10,"value"=0},"fade-time1"={"min"=0,"max"=10000,"value"=500},"bgsc"={"min"=0,"max"=65536,"value"=65536},"brightness-probe"={"min"=0,"max"=1024,"value"=1024},"fade-time3"={"min"=0,"max"=10000,"value"=500},"bklt"={"min"=0,"max"=65535,"value"=65403},"linear-brightness"={"min"=0,"max"=65403,"value"=65403},"brightness"={"min"=0,"max"=1024,"value"=1024},"brightness-fade"={"min"=0,"max"=1023,"value"=0},"usable-linear-brightness"={"min"=655,"max"=65403,"value"=65403},"ownr"=4294968497}
+--- 显示器列表 ---
+Graphics/Displays:
+
+    Intel Iris Xe Graphics:
+
+      Chipset Model: Intel Iris Xe Graphics
+      Type: GPU
+      Bus: Built-In
+      VRAM (Dynamic, Max): 1536 MB
+      Vendor: Intel
+      Device ID: 0x9a49
+      Revision ID: 0x0003
+      Metal Support: Metal 2
+      Displays:
+        Display:
+          Resolution: 1920 x 1080 (1080p FHD - Full High Definition)
+          UI Looks like: 1920 x 1080
+          Framebuffer Depth: 30-Bit Color (ARGB2101010)
+          Main Display: Yes
+          Mirror: Off
+          Online: Yes
+          Automatically Adjust Brightness: No
+          Display Asleep: Yes
+          Connection Type: Internal
+
+--- framebuffer 在线状态 ---
+  |   "AAPL,boot-display" = Yes
+  |   "IOPowerManagement" = {"ChildrenPowerState"=0,"MaxPowerState"=2,"CurrentPowerState"=1,"CapabilityFlags"=0,"ChildProxyPowerState"=2,"DriverPowerState"=1}
+  | |   "IOClass" = "AppleMCCSControlModule"
+  |       "IOClass" = "AppleMCCSParameterHandler"
+  |     "IOClass" = "AppleUpstreamUserClientDriver"
+  |     "IOPowerManagement" = {"CapabilityFlags"=0,"CurrentPowerState"=0}
+  |       "IOClass" = "AppleBacklightDisplay"
+  |       "IOPowerManagement" = {"DevicePowerState"=0,"CurrentPowerState"=0,"CapabilityFlags"=0,"MaxPowerState"=3}
+  |   "IOPowerManagement" = {"MaxPowerState"=2,"CurrentPowerState"=2,"CapabilityFlags"=32768,"ChildProxyPowerState"=2,"DriverPowerState"=1}
+  | |   "IOClass" = "AppleMCCSControlModule"
+--- 唤醒后 IG 日志 ---
+2026-11-04 23:07:39.800 F  kernel[0:327] (IOAcceleratorFamily2) IOReturn IOAccelDisplayPipe::display_change_handler(void *, IOFramebuffer *, IOIndex, void *) event = <93> at <186506432932>
+2026-11-04 23:07:39.800 F  kernel[0:327] (IOAcceleratorFamily2) IOReturn IOAccelDisplayPipe::display_change_handler(void *, IOFramebuffer *, IOIndex, void *) completed at <186506436418> taking <3486> ns
+2026-11-04 23:07:39.810 Df kernel[0:2888] (AppleIntelTGLGraphicsFramebuffer) [IGFB][ERROR][DISPLAY  ] FB0 is not enabled
+2026-11-04 23:07:39.816 Df kernel[0:2888] (AppleIntelTGLGraphicsFramebuffer) [IGFB][ERROR][DISPLAY  ] FB0 is not enabled
+2026-11-04 23:07:44.066 F  kernel[0:327] (IOAcceleratorFamily2) IOReturn IOAccelDisplayPipe::display_change_handler(void *, IOFramebuffer *, IOIndex, void *) event = <90> at <190772037475>
+2026-11-04 23:07:44.066 F  kernel[0:327] (IOAcceleratorFamily2) IOReturn IOAccelDisplayPipe::display_change_handler(void *, IOFramebuffer *, IOIndex, void *) completed at <190772059972> taking <22497> ns
+2026-11-04 23:07:44.066 F  kernel[0:327] (IOAcceleratorFamily2) IOReturn IOAccelDisplayPipe::display_change_handler(void *, IOFramebuffer *, IOIndex, void *) event = <92> at <190772099328>
+2026-11-04 23:07:44.066 F  kernel[0:327] (IOAcceleratorFamily2) IOReturn IOAccelDisplayPipe::display_change_handler(void *, IOFramebuffer *, IOIndex, void *) completed at <190772103017> taking <3689> ns
+2026-11-04 23:07:44.066 F  kernel[0:327] (IOAcceleratorFamily2) IOReturn IOAccelDisplayPipe::display_change_handler(void *, IOFramebuffer *, IOIndex, void *) event = <90> at <190772150669>
+2026-11-04 23:07:44.066 F  kernel[0:327] (IOAcceleratorFamily2) IOReturn IOAccelDisplayPipe::display_change_handler(void *, IOFramebuffer *, IOIndex, void *) completed at <190772155413> taking <4744> ns
+2026-11-04 23:07:44.066 F  kernel[0:327] (IOAcceleratorFamily2) IOReturn IOAccelDisplayPipe::display_change_handler(void *, IOFramebuffer *, IOIndex, void *) event = <92> at <190772182183>
+2026-11-04 23:07:44.066 F  kernel[0:327] (IOAcceleratorFamily2) IOReturn IOAccelDisplayPipe::display_change_handler(void *, IOFramebuffer *, IOIndex, void *) completed at <190772192985> taking <10802> ns
+2026-11-04 23:07:44.066 F  kernel[0:327] (IOAcceleratorFamily2) IOReturn IOAccelDisplayPipe::display_change_handler(void *, IOFramebuffer *, IOIndex, void *) event = <90> at <190772222295>
+2026-11-04 23:07:44.066 F  kernel[0:327] (IOAcceleratorFamily2) IOReturn IOAccelDisplayPipe::display_change_handler(void *, IOFramebuffer *, IOIndex, void *) completed at <190772234366> taking <12071> ns
+2026-11-04 23:07:44.066 F  kernel[0:327] (IOAcceleratorFamily2) IOReturn IOAccelDisplayPipe::display_change_handler(void *, IOFramebuffer *, IOIndex, void *) event = <92> at <190772260693>
+2026-11-04 23:07:44.066 F  kernel[0:327] (IOAcceleratorFamily2) IOReturn IOAccelDisplayPipe::display_change_handler(void *, IOFramebuffer *, IOIndex, void *) completed at <190772264250> taking <3557> ns
+2026-11-04 23:07:44.152 Df kernel[0:327] (AppleIntelTGLGraphicsFramebuffer) [IGFB][ERROR][DISPLAY  ] FB0 is not enabled
+2026-11-04 23:07:44.152 Df kernel[0:785] (AppleIntelTGLGraphicsFramebuffer) [IGFB][INFO ][POWER    ] FB0: power state transition Wake --> Doze
+2026-11-04 23:07:44.152 F  kernel[0:785] (IOAcceleratorFamily2) IOReturn IOAccelDisplayPipe::display_change_handler(void *, IOFramebuffer *, IOIndex, void *) event = <7> at <190857827969>
+2026-11-04 23:07:44.152 F  kernel[0:785] (IOAcceleratorFamily2) IOReturn IOAccelDisplayPipe::display_change_handler(void *, IOFramebuffer *, IOIndex, void *) completed at <190857838889> taking <10920> ns
+2026-11-04 23:07:44.478 Df kernel[0:70] (AppleIntelTGLGraphicsFramebuffer) [IGFB][ERROR][DISPLAY  ] Hotplug received on closable display - bailing out
+2026-11-04 23:07:44.509 F  kernel[0:785] (IOAcceleratorFamily2) IOReturn IOAccelDisplayPipe::display_change_handler(void *, IOFramebuffer *, IOIndex, void *) event = <5> at <191214916326>
+2026-11-04 23:07:44.509 F  kernel[0:785] (IOAcceleratorFamily2) IOReturn IOAccelDisplayPipe::display_change_handler(void *, IOFramebuffer *, IOIndex, void *) completed at <191214921425> taking <5099> ns
+2026-11-04 23:07:44.509 Df kernel[0:785] (AppleIntelTGLGraphicsFramebuffer) [IGFB][INFO ][POWER    ] FB0: Power state transition completed
+2026-11-04 23:07:44.663 Df kernel[0:2915] (AppleIntelTGLGraphicsFramebuffer) [IGFB][WARN ][DISPLAY  ] BRINGUP: Check if the below WA is applicable for TGL
+2026-11-04 23:07:44.668 Df kernel[0:2915] (AppleIntelTGLGraphicsFramebuffer) [IGFB][ERROR][AUX      ] ddi = 0 Time out: 0x5d40023f
+2026-11-04 23:07:44.672 Df kernel[0:2915] (AppleIntelTGLGraphicsFramebuffer) [IGFB][ERROR][AUX      ] ddi = 0 Time out: 0x5d40023f
+2026-11-04 23:07:44.676 Df kernel[0:2915] (AppleIntelTGLGraphicsFramebuffer) [IGFB][ERROR][AUX      ] ddi = 0 Time out: 0x5d40023f
+2026-11-04 23:07:44.680 Df kernel[0:2915] (AppleIntelTGLGraphicsFramebuffer) [IGFB][ERROR][AUX      ] ddi = 0 Time out: 0x5d40023f
+2026-11-04 23:07:44.684 Df kernel[0:2915] (AppleIntelTGLGraphicsFramebuffer) [IGFB][ERROR][AUX      ] ddi = 0 Time out: 0x5d40023f
+2026-11-04 23:07:44.689 Df kernel[0:2915] (AppleIntelTGLGraphicsFramebuffer) [IGFB][ERROR][AUX      ] ddi = 0 Time out: 0x5d40023f
+2026-11-04 23:07:44.693 Df kernel[0:2915] (AppleIntelTGLGraphicsFramebuffer) [IGFB][ERROR][AUX      ] ddi = 0 Time out: 0x5d40023f
+2026-11-04 23:07:44.772 Df kernel[0:2915] (AppleIntelTGLGraphicsFramebuffer) [IGFB][WARN ][DISPLAY  ] BRINGUP: Check if the below WA is applicable for TGL
+2026-11-04 23:07:44.776 Df kernel[0:2915] (AppleIntelTGLGraphicsFramebuffer) [IGFB][ERROR][AUX      ] ddi = 0 Time out: 0x5d40023f
+2026-11-04 23:07:44.780 Df kernel[0:2915] (AppleIntelTGLGraphicsFramebuffer) [IGFB][ERROR][AUX      ] ddi = 0 Time out: 0x5d40023f
+2026-11-04 23:07:44.784 Df kernel[0:2915] (AppleIntelTGLGraphicsFramebuffer) [IGFB][ERROR][AUX      ] ddi = 0 Time out: 0x5d40023f
+2026-11-04 23:07:44.789 Df kernel[0:2915] (AppleIntelTGLGraphicsFramebuffer) [IGFB][ERROR][AUX      ] ddi = 0 Time out: 0x5d40023f
+2026-11-04 23:07:44.793 Df kernel[0:2915] (AppleIntelTGLGraphicsFramebuffer) [IGFB][ERROR][AUX      ] ddi = 0 Time out: 0x5d40023f
+2026-11-04 23:07:44.797 Df kernel[0:2915] (AppleIntelTGLGraphicsFramebuffer) [IGFB][ERROR][AUX      ] ddi = 0 Time out: 0x5d40023f
+2026-11-04 23:07:44.801 Df kernel[0:2915] (AppleIntelTGLGraphicsFramebuffer) [IGFB][ERROR][AUX      ] ddi = 0 Time out: 0x5d40023f
+======================
