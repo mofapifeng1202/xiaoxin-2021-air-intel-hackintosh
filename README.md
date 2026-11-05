@@ -44,7 +44,6 @@
 
 ## 快速链接
 
-- [完整折腾记录](xiaoxin-hackintosh-对话记录-2026-11-03.md)
 - [EFI 详细说明](EFI/README.md)
 - [电源守护说明](power-policy/README.md)
 - [触摸板 AuxKC 重建命令](命令.md)
