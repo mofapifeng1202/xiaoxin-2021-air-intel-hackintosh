@@ -24,10 +24,10 @@
 ```text
 .
 ├── README.md                                本文件
+├── FAQ.md                                   常见问题（声音 / Wi-Fi / 外接显示 / 蓝牙等）
 ├── EFI/                                     已脱敏的完整 EFI（OpenCore / kexts / ACPI）
 │   └── README.md                            EFI 详细说明与关键改动
 ├── checksums.txt                            EFI 内全部文件的 SHA-256
-├── xiaoxin-hackintosh-对话记录-2026-11-03.md 完整折腾记录（11 节，含全过程与日志证据）
 ├── 命令.md                                  触摸板 AuxKC 重建命令（历史记录）
 ├── power-policy/                            电源守护（防合盖睡眠 → 唤醒黑屏）
 │   ├── README.md
@@ -44,6 +44,7 @@
 
 ## 快速链接
 
+- [常见问题（FAQ）](FAQ.md)
 - [EFI 详细说明](EFI/README.md)
 - [电源守护说明](power-policy/README.md)
 - [触摸板 AuxKC 重建命令](命令.md)
@@ -57,7 +58,9 @@
 
 ## 已知限制
 
-外接显示、主动关屏、AirDrop/Handoff 在本机不可用；原因与实测证据见完整记录第八节。
+外接显示、主动关屏、AirDrop/Handoff 在本机不可用；原因与实测日志见
+[EFI/README.md 文末](EFI/README.md#附加2026-11-04-23302359外接显示实测不可用)，
+Wi-Fi 与其它常见问题见 [FAQ.md](FAQ.md)。
 
 ## 关于三码
 

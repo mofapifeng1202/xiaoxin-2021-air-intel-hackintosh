@@ -145,7 +145,7 @@ GUID 7C436110-AB2A-4BBB-A880-FE41995C9F82
 **重装系统后：**
 
 1. 把 5 个 Voodoo kext 拷到 `/Library/Extensions`
-2. 重建 AuxKC（配方见项目文档第六节）
+2. 重建 AuxKC（配方见仓库根目录 [命令.md](../命令.md)）
 3. 装 WEX Graphics pkg（0.3.2）
 4. 装 OCLP Modern Audio 根补丁
 5. 重启
@@ -186,7 +186,7 @@ sudo diskutil mount disk0s1        # 当前是 SYSTEM_DRV
 ```text
 PciRoot(0x0)/Pci(0x2,0x0):
   framebuffer-patch-enable = 01000000
-  framebuffer-stolenmem    = 00000008
+  framebuffer-stolenmem    = 0000c003
   hda-gfx                  = onboard-1
 
 PciRoot(0x0)/Pci(0x1f,0x3):
