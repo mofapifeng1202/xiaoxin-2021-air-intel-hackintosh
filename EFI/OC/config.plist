@@ -126,6 +126,14 @@
 				<key>Path</key>
 				<string>SSDT-TPD0-GPIO-YOGA14S2021.aml</string>
 			</dict>
+			<dict>
+				<key>Comment</key>
+				<string>SSDT-PSRDBG (AC _PSR debounce)</string>
+				<key>Enabled</key>
+				<true/>
+				<key>Path</key>
+				<string>SSDT-PSRDBG.aml</string>
+			</dict>
 		</array>
 		<key>Delete</key>
 		<array/>
@@ -467,6 +475,45 @@
 				<key>Replace</key>
 				<data>
 				oA0BpIRTQkZCU0JGRw==
+				</data>
+				<key>ReplaceMask</key>
+				<data>
+				</data>
+				<key>Skip</key>
+				<integer>0</integer>
+				<key>TableLength</key>
+				<integer>0</integer>
+				<key>TableSignature</key>
+				<data>
+				RFNEVA==
+				</data>
+			</dict>
+			<dict>
+				<key>Base</key>
+				<string></string>
+				<key>BaseSkip</key>
+				<integer>0</integer>
+				<key>Comment</key>
+				<string>ACAD _PSR to XPSR (for SSDT-PSRDBG)</string>
+				<key>Count</key>
+				<integer>1</integer>
+				<key>Enabled</key>
+				<true/>
+				<key>Find</key>
+				<data>
+				X1BTUg==
+				</data>
+				<key>Limit</key>
+				<integer>0</integer>
+				<key>Mask</key>
+				<data>
+				</data>
+				<key>OemTableId</key>
+				<data>
+				</data>
+				<key>Replace</key>
+				<data>
+				WFBTUg==
 				</data>
 				<key>ReplaceMask</key>
 				<data>
@@ -1187,7 +1234,7 @@
 			<key>TakeoffDelay</key>
 			<integer>0</integer>
 			<key>Timeout</key>
-			<integer>5</integer>
+			<integer>10</integer>
 		</dict>
 		<key>Debug</key>
 		<dict>
@@ -1240,6 +1287,12 @@
 			<string>Disabled</string>
 			<key>Vault</key>
 			<string>Optional</string>
+			<key>RequestBootVarRouting</key>
+			<true/>
+			<key>LauncherOption</key>
+			<string>Full</string>
+			<key>LauncherPath</key>
+			<string>Default</string>
 		</dict>
 		<key>Serial</key>
 		<dict>
@@ -1283,17 +1336,17 @@
 				<key>Arguments</key>
 				<string></string>
 				<key>Auxiliary</key>
-				<true/>
-				<key>Comment</key>
-				<string>CleanNvram.efi</string>
-				<key>Enabled</key>
 				<false/>
+				<key>Comment</key>
+				<string>Reset NVRAM (CleanNvram.efi)</string>
+				<key>Enabled</key>
+				<true/>
 				<key>Flavour</key>
 				<string>Auto</string>
 				<key>FullNvramAccess</key>
 				<false/>
 				<key>Name</key>
-				<string>CleanNvram.efi</string>
+				<string>Reset NVRAM</string>
 				<key>Path</key>
 				<string>CleanNvram.efi</string>
 				<key>RealPath</key>
@@ -1307,15 +1360,15 @@
 				<key>Auxiliary</key>
 				<true/>
 				<key>Comment</key>
-				<string>OpenShell.efi</string>
+				<string>OpenShell (kept, hidden)</string>
 				<key>Enabled</key>
-				<true/>
+				<false/>
 				<key>Flavour</key>
 				<string>Auto</string>
 				<key>FullNvramAccess</key>
 				<false/>
 				<key>Name</key>
-				<string>OpenShell.efi</string>
+				<string>OpenShell</string>
 				<key>Path</key>
 				<string>OpenShell.efi</string>
 				<key>RealPath</key>
@@ -1553,7 +1606,7 @@
 			<key>KeySupport</key>
 			<true/>
 			<key>KeySupportMode</key>
-			<string>V2</string>
+			<string>V1</string>
 			<key>KeySwap</key>
 			<false/>
 			<key>PointerSupport</key>

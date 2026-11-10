@@ -15,6 +15,9 @@
 8. [蓝牙一直 Off，芯片显示 BCM_4350C2](#8-蓝牙一直-off芯片显示-bcm_4350c2)
 9. [电池显示 1%，电压/容量读不到](#9-电池显示-1电压容量读不到)
 10. [三码已清空，怎么正常使用 iMessage / App Store？](#10-三码已清空怎么正常使用-imessage--app-store)
+11. [充满电后反复响"充电"提示音](#11-充满电后反复响充电提示音)
+12. [OpenCore 引导界面键盘没反应 / 触摸板不能用](#12-opencore-引导界面键盘没反应--触摸板不能用)
+13. [F12 里没有 OpenCore / 怎么让 Windows 成为默认启动项](#13-f12-里没有-opencore--怎么让-windows-成为默认启动项)
 
 ---
 
@@ -234,3 +237,101 @@ bluetoothInternalControllerInfo = 0000000000000000000000000000（14 字节）
 2. 填入 `PlatformInfo > Generic`；
 3. `ROM` 用本机网卡 MAC 生成（12 位十六进制）；
 4. 不要多台机器共用同一套三码。
+
+---
+
+## 11. 充满电后反复响"充电"提示音
+
+**现象**：电量到 100% 后，每隔几秒到几分钟就响一次"接入电源"音效，状态栏电源图标闪一下。
+
+**不是真的断电**。实测证据：
+
+```text
+ioreg: ExternalConnected 始终为 Yes，容量/电压没有变化
+但抖动瞬间 Amperage 出现 27248 mA / 13088 mA / -2036 mA 等不可能的数值 → EC 数据撕裂读
+pmset: Using Batt 只持续约 1 秒就回到 Using AC，并触发 PowerChime
+```
+
+**根因**：EC 查询方法 `_Q37` 在满电后频繁触发：
+
+```asl
+Notify (ACAD, 0x80)     // 通知电源状态变化
+Sleep (1000)
+Notify (BAT1, 0x80)
+```
+
+macOS 的 `SMCBatteryManager` 收到通知后重新求值 `ACAD._PSR`（直接读 EC 的 `ADPT` 位）。
+EC 正在改写状态字节的瞬间，`ADPT` 被读成 0 → `powerd` 判定切到电池；
+1 秒后再读回 1 → 判定插电 → 播放音效。满电后 EC 不再充电、状态位变化更频繁，所以集中出现。
+
+**修复**：`SSDT-PSRDBG` + 一条 DSDT 重命名补丁：
+
+```text
+Find:    5F 50 53 52  ("_PSR")
+Replace: 58 50 53 52  ("XPSR")
+```
+
+新 `_PSR` 逻辑（源码见 [acpi-psr/SSDT-PSRDBG.dsl](acpi-psr/SSDT-PSRDBG.dsl)）：
+
+1. `ADPT = 1` → 立即返回 1；
+2. `ADPT = 0` 且上次已经是 0 → 直接返回 0（电池模式不引入延时）；
+3. `ADPT = 0` 但上次是 1 → 等 2500ms 再读，仍为 0 才认定真的拔掉。
+
+**代价**：真实拔电源后，状态栏约 2.5 秒才切到电池；插回电源是立即的。
+
+**回滚**：把 `ACPI > Patch` 里 `ACAD _PSR to XPSR` 的 `Enabled` 改为 `false`，重启即可。
+
+---
+
+## 12. OpenCore 引导界面键盘没反应 / 触摸板不能用
+
+**键盘**（可以解决）：
+
+- 需要 `UEFI > Input > KeySupport = true`；
+- `KeySupportMode` 逐个试 `V1` / `V2` / `Auto`（`AMI` 只适用于 AMI 固件，
+  本机是 Insyde，无效）；
+- 本机实测 **V2 无效、V1 可用**；
+- **热重启后可能失灵**：长按电源彻底关机再开机（让 EC/PS2 重新初始化）；
+- V1 模式下修饰键可能识别不到，设置默认启动项时用
+  **按住 `=` 再按 Enter** 代替 `CTRL + Enter`。
+
+**触摸板**（无解）：
+
+- OpenCore 的 `PointerSupport` 只支持 ASUS Z87/Z97 的专用 OEM 协议，联想无效；
+- 本机触摸板是 I2C（macOS 里走 VoodooI2C），固件没有暴露 PS/2 鼠标接口，
+  加 `Ps2MouseDxe.efi` 也找不到设备；
+- 结论：引导界面用键盘操作，或外接 USB 鼠标。
+
+---
+
+## 13. F12 里没有 OpenCore / 怎么让 Windows 成为默认启动项
+
+Insyde 固件的 F12 只列出 NVRAM 里已登记的启动项，**不会自动扫描内置盘的
+`\EFI\Boot\bootx64.efi`**，所以把 OC 复制进 ESP 后 F12 里看不到它。
+
+**装到内置 ESP（可选，不再依赖 U 盘）**：
+
+1. 把 `EFI/OC` 复制到内置 ESP（`disk0s1`，卷标 `SYSTEM_DRV`）；
+2. 用 OpenCore 的 `BOOTx64.efi` 替换 `EFI/Boot/bootx64.efi`
+   （`EFI/Microsoft` 保持不动，Windows 仍可从 OC 菜单启动）；
+3. config 里设置：
+   ```text
+   Misc > Security > RequestBootVarRouting = true
+   Misc > Security > LauncherOption        = Full
+   ```
+   OC 首次从内置 ESP 启动后会自动生成最高优先级的 `OpenCore` 启动项；
+4. 在 Windows（管理员 CMD）执行一次：
+   ```cmd
+   bcdedit /set {bootmgr} path \EFI\OC\OpenCore.efi
+   ```
+5. 重启进入 OC 菜单 → 高亮 Windows → `CTRL + Enter`（或按住 `=` 再 Enter）
+   设为默认，之后默认停在 Windows，超时自动进入。
+
+**恢复 Windows 直接启动**：
+
+```cmd
+bcdedit /set {bootmgr} path \EFI\Microsoft\Boot\bootmgfw.efi
+```
+
+> 如果这套 EFI 是从 **U 盘**使用，建议把 `LauncherOption` 改为 `Disabled`：
+> 个别固件（如 Intel Visual BIOS）会把 OpenCore 启动项当成唯一可见项。

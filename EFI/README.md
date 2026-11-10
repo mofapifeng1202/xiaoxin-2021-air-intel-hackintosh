@@ -40,7 +40,9 @@
 | ✅ | 合盖 | 合盖不睡眠、硬件关屏、开盖即亮（常驻守护钉住 `SleepDisabled=1`，重启自动生效） |
 | ❌ | 外接显示 | 板载 HDMI 与 USB-C DP 均不可用（WEX 限制，见文末） |
 | ⚠️ | 主动关屏 | 显示休眠唤醒黑屏（WEX 上游缺陷，见文末） |
-| ⚠️ | 引导键盘 | `KeySupportMode=V2`，未验证 |
+| ✅ | 充电状态 | 满电后反复响提示音已修复（`SSDT-PSRDBG` 去抖） |
+| ✅ | 引导键盘 | `KeySupportMode=V1`（冷启动可用；热重启后可能失灵，彻底关机再开） |
+| ❌ | 引导触摸板 | 触摸板仅 I2C，固件无 PS/2 鼠标接口，OpenCanopy 不支持 |
 
 ---
 
@@ -117,6 +119,30 @@ GUID 7C436110-AB2A-4BBB-A880-FE41995C9F82
 所以日志里出现 `Could not find GPIO controller, exiting`）。
 
 加 `-vi2c-force-polling` 让 nub 跳过 GPIO，HID 驱动改走轮询。
+
+---
+
+## 关键改动 4：充电状态去抖（SSDT-PSRDBG）
+
+满电后系统会反复以为电源被拔插、不停播放"充电"音效。原因是 EC 查询 `_Q37`
+触发 `Notify(ACAD, 0x80)` 后，macOS 立刻读 `ACAD._PSR`，而 EC 状态字节在
+改写瞬间会把 `ADPT`（AC 在位）读成 0，1 秒后又读回 1。
+
+处理方式：
+
+```text
+ACPI > Patch（仅 DSDT，Count = 1）:
+  Find:    5F 50 53 52   ("_PSR")
+  Replace: 58 50 53 52   ("XPSR")
+
+ACPI > Add: SSDT-PSRDBG.aml
+```
+
+新的 `_PSR` 只在"从 AC 掉下来"时多等 2500ms 再确认一次，
+电池模式下不引入任何延时。源码与说明见
+[acpi-psr/](../acpi-psr/)，完整分析见 [FAQ 第 11 条](../FAQ.md#11-充满电后反复响充电提示音)。
+
+> 代价：真实拔掉电源后，状态栏约 2.5 秒才切到电池；插回是立即的。
 
 ---
 
@@ -208,7 +234,7 @@ prev-lang:kbd     = en-US:0
 ```text
 SSDT-AWAC / SSDT-EC-USBX-LAPTOP / SSDT-HPET / SSDT-PNLF-CFL /
 SSDT-RHUB / SSDT-UIAC / SSDT-NameS3-disable / SSDT-PLUG-_SB.PR00 /
-SSDT-OCGPI0-GPHD / SSDT-OC-XOSI
+SSDT-OCGPI0-GPHD / SSDT-OC-XOSI / SSDT-PSRDBG
 ```
 
 **ACPI 禁用：**
@@ -218,11 +244,34 @@ SSDT-PLUG / SSDT-OCBAT1-YOGA14S2021 / SSDT-BATS-YOGA14S2021 /
 SSDT-OCI2C-TPXX-YOGA14S2021 / SSDT-TPD0-GPIO-YOGA14S2021
 ```
 
-**ACPI Patch 共 9 条：**
+**ACPI Patch 共 10 条：**
 
 - 禁用：`_BIF→XBIF`、`_BST→XBST`
 - 启用：HPET `_CRS→XCRS`、RTC IRQ8、TIMR IRQ0、`PNLF→XNLF`、`_S3_→XS3_`、
-  `TPAD skip OSYS`、`TPAD return SBFB+SBFG`（后两条是本机新增）
+  `TPAD skip OSYS`、`TPAD return SBFB+SBFG`（后两条是本机新增）、
+  `ACAD _PSR→XPSR`（配合 `SSDT-PSRDBG` 做充电状态去抖）
+
+**UEFI / Input / Tools：**
+
+```text
+UEFI > Input:
+  KeySupport        = true
+  KeySupportMode    = V1
+  PointerSupport    = false
+
+Misc > Tools:
+  Reset NVRAM (CleanNvram.efi) = 启用
+  OpenShell                    = 隐藏（Enabled = false）
+
+Misc > Security:
+  AllowSetDefault       = true
+  RequestBootVarRouting = true
+  LauncherOption        = Full
+```
+
+> `LauncherOption = Full` 适合把 OpenCore 装进内置 ESP 的用法；
+> 如果直接从 U 盘引导，建议改为 `Disabled`（个别固件会把 OpenCore
+> 启动项当成唯一可见项）。详见 [FAQ 第 13 条](../FAQ.md#13-f12-里没有-opencore--怎么让-windows-成为默认启动项)。
 
 `OC/Kexts` 里 VoodooI2C 相关条目全部禁用（走 `/Library/Extensions` + AuxKC）。
 
@@ -304,6 +353,34 @@ WEX README 明确：*full system sleep/wake unverified*。
 - 合盖可用，但系统继续运行（发热/耗电），别长时间合盖收纳
 - 不要主动关屏（`pmset displaysleepnow` / 设置里的"关闭显示器"）→ 会黑
 - 长时间收纳先关机；万一黑屏长按电源键
+
+---
+
+## 引导方式（内置 ESP / U 盘 / 默认启动项）
+
+本机最终方案：OpenCore 装在**内置 ESP**（`disk0s1`，卷标 `SYSTEM_DRV`），
+固件里的 `Windows Boot Manager` 条目通过 bcdedit 指向 `\EFI\OC\OpenCore.efi`：
+
+- `EFI/OC` + `EFI/Boot/bootx64.efi` 来自本仓库的 `EFI/` 目录；
+- `EFI/Microsoft` 保持原样，Windows 仍可从 OC 菜单启动；
+- `LauncherOption = Full`：OC 首次启动后会在 NVRAM 生成最高优先级的
+  `OpenCore` 启动项；
+- `Timeout = 10`：默认停在 Windows，10 秒无操作自动进入。
+
+**设置默认启动项**：在 OC 菜单里高亮 Windows → `CTRL + Enter`；
+V1 键盘模式下修饰键可能无效，改为**按住 `=` 再按 Enter**。
+
+**从 U 盘使用**：把 `EFI/` 复制到 U 盘 ESP 即可；建议把 `LauncherOption`
+改为 `Disabled`，避免个别固件（如 Intel Visual BIOS）只显示 OpenCore 条目。
+
+**恢复 Windows 直接启动**（管理员 CMD）：
+
+```cmd
+bcdedit /set {bootmgr} path \EFI\Microsoft\Boot\bootmgfw.efi
+```
+
+**引导界面键盘**：`KeySupportMode = V1`；若热重启后键盘失灵，彻底关机再开机。
+**触摸板**在引导界面不可用（仅 I2C，固件无 PS/2 鼠标接口）。
 
 ---
 

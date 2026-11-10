@@ -17,7 +17,9 @@
 | ❌ | 外接显示 | 板载 HDMI 与 USB-C DP 均不可用（WEX 驱动限制） |
 | ❌ | 内置麦克风 | DMIC，硬件无解 |
 | ⚠️ | 主动关屏 | 显示休眠唤醒黑屏（WEX 上游缺陷，已禁用睡眠规避） |
-| ⚠️ | 引导界面键盘 | `KeySupportMode=V2`，未验证 |
+| ✅ | 充电状态 | 满电后反复响提示音已修复（`SSDT-PSRDBG` 去抖，见 FAQ） |
+| ✅ | 引导界面键盘 | `KeySupportMode=V1`，冷启动可用；热重启后可能失灵 |
+| ❌ | 引导界面触摸板 | 触摸板只走 I2C，固件无 PS/2 鼠标接口，OpenCanopy 不支持 |
 
 ## 目录结构
 
@@ -25,6 +27,7 @@
 .
 ├── README.md                                本文件
 ├── FAQ.md                                   常见问题（声音 / Wi-Fi / 外接显示 / 蓝牙等）
+├── acpi-psr/                                充电状态去抖 SSDT 的源码与说明
 ├── EFI/                                     已脱敏的完整 EFI（OpenCore / kexts / ACPI）
 │   └── README.md                            EFI 详细说明与关键改动
 ├── checksums.txt                            EFI 内全部文件的 SHA-256
@@ -54,6 +57,7 @@
 - **触摸板**：两条 DSDT `_CRS` 补丁 + `-vi2c-force-polling` + 系统盘 AuxKC
 - **蓝牙**：IntelBluetoothFirmware / IntelBTPatcher 2.5.3（Tahoe build）+ BlueToolFixup 2.7.2
 - **合盖**：`SleepDisabled` 每次开机都会被 `powerd` 清 0，必须用常驻守护（每 2 秒校验）
+- **充电音效抖动**：EC 状态位瞬时误读 → `SSDT-PSRDBG` 给 `ACAD._PSR` 加 2.5 秒去抖
 - **只恢复 EFI 不够**：触摸板依赖 `/Library/Extensions` + AuxKC，声音依赖 OCLP Modern Audio 根补丁
 
 ## 已知限制
